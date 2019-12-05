@@ -1,0 +1,68 @@
+﻿Api desenvolvida em Python utilizando Flask e sqlite.
+
+Na primeira execução será criado o banco de dados sqlite e serão adicionados todos os registros existentes no arquivo sites.csv, o qual deve estar na mesma pasta do executável. Nas proximas execuções o mesmo banco de dados será utilizado, a não ser que o caminho/nome seja alterado.
+
+Para executar a aplicação é só abrir o arquivo api.exe com previlégios de administrador.
+
+O caminho para o banco de dados e endereço/porta da API podem ser configurados a partir do arquivo settings.ini
+
+Relações das tabelas no banco de dados ->
+scripts de criação das tabelas (primary keys e foreign keys)
+
+CREATE TABLE IF NOT EXISTS sites (
+                                        name text PRIMARY KEY,
+                                        status text);
+CREATE TABLE IF NOT EXISTS urls (
+                                        name text,
+                                        URL text,
+                                        FOREIGN KEY(name) REFERENCES sites(name));
+   
+CREATE TABLE IF NOT EXISTS categories (
+                                        name text,
+                                        category text,
+                                        FOREIGN KEY(name) REFERENCES sites(name)); 
+
+
+A Api está configurada por padrão pra servir no endereço localhost, na porta 5002
+Métodos da API-> 
+'GET' /item -> retorna todos os items existentes no banco no formato Json, identificados pelo nome no site, exemplo : 
+{"Site 4": {"Urls": ["car.com", "car.com/news", "car.com/new"], "Categories": ["news", "vehicle", "cars", "tuning"], "Active": "active"}}
+'GET' /item -> retorna o site por ID, no qual ID é o nome do site ('Site 1','Site2', etc...) 
+parâmetros ->
+id -> Nome do Site (não pode ser nulo)
+
+'POST' /item/ -> 
+parâmetros :
+id -> Nome do Site (não pode ser nulo)
+urls-> URLS do site, separadas por ;
+categories -> categorias do site, separadas por ;
+active -> estado do site, se nulo vai ser consireado como inativo
+
+'PATCH' /item/->
+parâmetros:
+id -> Nome do Site (não pode ser nulo)
+
+idPatch -> Nome do site caso seja necessário modificar o id informado anteriormente
+
+urls -> urls a serem atualizadas, devem ser separadas por ;. Se esse parâmetro não for enviado todos os valores enviados em urlsPatch serão inseridos (Atulizando informações do site *id*)
+
+urlsPatch -> valores das urls a serem atualizadas, separadas tambem por ;. (EX -> parâmetro url : jogos;sportes ,parâmetro urlsPatch : lazer,cultura. Com essa chamada os valores de URL na tabela de urls serão atualizados para os valores em urlsPatch ( só do site informado pelo ID, já tratando o caso em que o id seja atualizado por IDPatch))
+
+categories -> categorias a serem atualizadas, devem ser separadas por ;. Se esse parâmetro não for enviado todos os valores enviados em categories Patch serão inseridos (Atulizando informações do site *id*)
+
+categoriesPatch -> valores das categorias a serem atualizadas, separadas tambem por ;. (EX -> parâmetro categorias : jogos;sportes ,parâmetro categorias Patch : lazer,cultura. Com essa chamada os valores de categorias na tabela de categorias serão atualizados para os valores em categorias Patch ( só do site informado pelo ID, já tratando o caso em que o id seja atualizado por IDPatch))
+
+active -> atualizar se o site está ativo ou inativo
+
+'DELETE'/item/-> 
+parâmetros 
+id -> deleta todas as informações referentes ao site com nome informado no parâmetro *id*
+
+
+****
+Tempo de pesquisa/desenvolvimento/testes -> aproximadamente 5 horas
+O que faria se tivesse mais tempo?
+1. Escreveria uma documentação melhor
+2. Faria mais uso de itertools/list comprehension para remover o excesso de "for's" e "if's" no código
+3. Transformaria meus inserts/update/delets em funções para "limpar" o código
+4. Faria mais testes
